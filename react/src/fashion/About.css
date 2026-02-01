@@ -1,0 +1,73 @@
+.about-container {
+  padding: 60px 70px;
+  min-height: 97.5vh;
+  background: linear-gradient(
+    135deg,
+    #faf5ff,
+    #fdf2f8
+  );
+  font-family: "Poppins", sans-serif;
+}
+
+/* Title */
+.about-title {
+  font-family: "Playfair Display", serif;
+  font-size: 44px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #2b1c2f;
+}
+
+.about-title span {
+  color: #7c3aed;
+}
+
+/* Intro text */
+.about-intro {
+  font-size: 18px;
+  max-width: 720px;
+  color: #555;
+  margin-bottom: 50px;
+  line-height: 1.7;
+}
+
+/* Cards layout */
+.about-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 28px;
+}
+
+/* Individual card */
+.about-card {
+  background: #ffffff;
+  padding: 30px 26px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon styling */
+.icon {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+
+/* Card text */
+.about-card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #3a1f3c;
+}
+
+.about-card p {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+}
