@@ -1,74 +1,31 @@
-import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
 
+dotenv.config();
+
+// 🔹 Initialize Google Gemini AI
+const ai = new GoogleGenAI({
+  apiKey: process.env.GOOGLE_API_KEY, // must be in your .env
+});
+
+// 🔹 Load JSON fallback
+const dataPath = path.join(process.cwd(), "data", "outfits.json");
+const fallbackData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+
+// 🔹 Main function to get suggestion
 export async function getAISuggestion(query) {
-  const provider = process.env.AI_PROVIDER;
+  if (!query) throw new Error("Query is required");
 
-  if (provider === "gemini") {
-    return geminiAI(query);
-  }
-
-  if (provider === "openai") {
-    return openaiAI(query);
-  }
-
-  // if (provider === "huggingface") {
-  //   return huggingfaceAI(query);
-  // }
-
-  throw new Error("No valid AI provider");
-}
-
-/* ===================== GEMINI ===================== */
-async function geminiAI(query) {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
-
-  const res = await axios.post(url, {
-    contents: [
-      {
-        parts: [{ text: formatPrompt(query) }],
-      },
-    ],
-  });
-
-  return res.data.candidates[0].content.parts[0].text;
-}
-
-/* ===================== OPENAI ===================== */
-async function openaiAI(query) {
-  const res = await axios.post(
-    "https://api.openai.com/v1/chat/completions",
-    {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: formatPrompt(query) }],
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-    },
-  );
-
-  return res.data.choices[0].message.content;
-}
-
-/* ===================== HUGGING FACE ===================== */
-// async function huggingfaceAI(query) {
-//   const res = await axios.post(
-//     "https://api-inference.huggingface.co/models/google/flan-t5-large",
-//     { inputs: formatPrompt(query) },
-//     {
-//       headers: {
-//         Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-//       },
-//     },
-//   );
-
-//   return res.data[0].generated_text;
-// }
-
-/* ===================== COMMON PROMPT ===================== */
-function formatPrompt(query) {
-  return `You are a fashion assistant.
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: [
+        {
+          parts: [
+            {
+              text: `You are a fashion assistant.
 Suggest outfits clearly in this format:
 
 Top:
@@ -76,5 +33,33 @@ Bottom:
 Shoes:
 Accessories:
 
-User request: ${query}`;
+User request: ${query}`,
+            },
+          ],
+        },
+      ],
+    });
+
+    // 🔹 Extract the AI response safely
+    const text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) throw new Error("AI returned empty response");
+
+    return text;
+  } catch (err) {
+    console.error("AI failed:", err.message);
+
+    // 🔹 Fallback to JSON
+    const random =
+      fallbackData[Math.floor(Math.random() * fallbackData.length)];
+
+    const formatted = `
+Top: ${random.top}
+Bottom: ${random.bottom}
+Shoes: ${random.shoes}
+Accessories: ${random.accessories}
+    `;
+
+    return formatted;
+  }
 }

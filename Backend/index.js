@@ -7,15 +7,15 @@ import { getAISuggestion } from "./services/aiService.js";
 
 dotenv.config();
 
-const app = express(); // 🔹 THIS WAS MISSING
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-// JSON fallback
+// Load JSON fallback for offline/manual suggestions
 const dataPath = path.join(process.cwd(), "data", "outfits.json");
 const fallbackData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
 
-// 🔥 API ROUTE
+// 🔹 API route
 app.post("/api/style", async (req, res) => {
   const { query } = req.body;
 
@@ -24,11 +24,13 @@ app.post("/api/style", async (req, res) => {
   }
 
   try {
+    // Try AI first
     const result = await getAISuggestion(query);
     res.json({ source: "ai", result });
   } catch (err) {
-    console.error("AI failed:", err.message);
+    console.error("AI failed, using JSON fallback:", err.message);
 
+    // Fallback to manual JSON data
     const random =
       fallbackData[Math.floor(Math.random() * fallbackData.length)];
 
@@ -43,7 +45,7 @@ Accessories: ${random.accessories}
   }
 });
 
-// 🔹 START SERVER
+// 🔹 Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on http://localhost:${PORT}`);
