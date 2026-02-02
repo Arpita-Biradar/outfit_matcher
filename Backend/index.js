@@ -1,78 +1,50 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { getAISuggestion } from "./services/aiService.js";
 
 dotenv.config();
 
-const app = express();
+const app = express(); // 🔹 THIS WAS MISSING
 app.use(cors());
 app.use(express.json());
 
-// 📌 Load JSON fallback data
+// JSON fallback
 const dataPath = path.join(process.cwd(), "data", "outfits.json");
-const manualData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+const fallbackData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
 
+// 🔥 API ROUTE
 app.post("/api/style", async (req, res) => {
   const { query } = req.body;
+
   if (!query) {
     return res.status(400).json({ error: "Query is required" });
   }
 
   try {
-    // 🔥 PRIMARY: Gemini API
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const result = await getAISuggestion(query);
+    res.json({ source: "ai", result });
+  } catch (err) {
+    console.error("AI failed:", err.message);
 
-    const geminiRes = await axios.post(url, {
-      contents: [
-        {
-          parts: [
-            {
-              text: `You are a fashion assistant.
-Suggest outfits clearly in this format:
+    const random =
+      fallbackData[Math.floor(Math.random() * fallbackData.length)];
 
-Top:
-Bottom:
-Shoes:
-Accessories:
-
-User request: ${query}`,
-            },
-          ],
-        },
-      ],
-    });
-
-    const text = geminiRes.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) throw new Error("Empty AI response");
-
-    return res.json({
-      source: "ai",
-      result: text,
-    });
-  } catch (error) {
-    console.error("⚠️ AI failed, using JSON fallback");
-
-    // 🧠 FALLBACK: JSON data
-    const random = manualData[Math.floor(Math.random() * manualData.length)];
-
-    const formattedResult = `
+    const formatted = `
 Top: ${random.top}
 Bottom: ${random.bottom}
 Shoes: ${random.shoes}
 Accessories: ${random.accessories}
     `;
 
-    return res.json({
-      source: "manual",
-      result: formattedResult,
-    });
+    res.json({ source: "manual", result: formatted });
   }
 });
 
-app.listen(5000, () => {
-  console.log("✅ Backend running on http://localhost:5000");
+// 🔹 START SERVER
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Backend running on http://localhost:${PORT}`);
 });
