@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import Home from "./fashion/home";
 import Sidebar from "./fashion/Sidebar";
-import About from  "./fashion/About";
+import About from "./fashion/About";
 
 export default function App() {
   const [active, setActive] = useState("home");
