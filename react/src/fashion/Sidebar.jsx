@@ -40,72 +40,74 @@ export default function Sidebar({
             </button>
           </div>
 
-          <div className={`filters-panel ${filtersOpen ? "open" : ""}`}>
-            <button
-              type="button"
-              className="filters-toggle"
-              onClick={() => setFiltersOpen((prev) => !prev)}
-              aria-expanded={filtersOpen}
-            >
-              <span>Filters</span>
-              <span className="filters-chevron">
-                {filtersOpen ? "-" : "+"}
-              </span>
-            </button>
+          {active === "home" && (
+            <div className={`filters-panel ${filtersOpen ? "open" : ""}`}>
+              <button
+                type="button"
+                className="filters-toggle"
+                onClick={() => setFiltersOpen((prev) => !prev)}
+                aria-expanded={filtersOpen}
+              >
+                <span>Filters</span>
+                <span className="filters-chevron">
+                  {filtersOpen ? "-" : "+"}
+                </span>
+              </button>
 
-            <div className="filters-body">
-              <label className="filter-field">
-                <span>Gender</span>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="Female">Female</option>
-                  <option value="Male">Male</option>
-                  <option value="Non-binary">Non-binary</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                </select>
-              </label>
+              <div className="filters-body">
+                <label className="filter-field">
+                  <span>Gender</span>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    <option value="">Any</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </label>
 
-              <label className="filter-field">
-                <span>Size Range</span>
-                <select
-                  value={sizeRange}
-                  onChange={(e) => setSizeRange(e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="XS - S">XS - S</option>
-                  <option value="M - L">M - L</option>
-                  <option value="XL - XXL">XL - XXL</option>
-                  <option value="Plus size">Plus size</option>
-                </select>
-              </label>
+                <label className="filter-field">
+                  <span>Size Range</span>
+                  <select
+                    value={sizeRange}
+                    onChange={(e) => setSizeRange(e.target.value)}
+                  >
+                    <option value="">Any</option>
+                    <option value="XS - S">XS - S</option>
+                    <option value="M - L">M - L</option>
+                    <option value="XL - XXL">XL - XXL</option>
+                    <option value="Plus size">Plus size</option>
+                  </select>
+                </label>
 
-              <label className="filter-field">
-                <span>Budget</span>
-                <select
-                  value={budget}
-                  onChange={(e) => setBudget(e.target.value)}
-                >
-                  <option value="">Any</option>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </label>
+                <label className="filter-field">
+                  <span>Budget</span>
+                  <select
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                  >
+                    <option value="">Any</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </label>
 
-              <label className="filter-field">
-                <span>Favorite Colors</span>
-                <input
-                  type="text"
-                  value={favoriteColors}
-                  onChange={(e) => setFavoriteColors(e.target.value)}
-                  placeholder="blush, black, emerald"
-                />
-              </label>
+                <label className="filter-field">
+                  <span>Favorite Colors</span>
+                  <input
+                    type="text"
+                    value={favoriteColors}
+                    onChange={(e) => setFavoriteColors(e.target.value)}
+                    placeholder="blush, black, emerald"
+                  />
+                </label>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="profile-section">

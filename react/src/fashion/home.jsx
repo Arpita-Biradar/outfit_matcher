@@ -66,6 +66,8 @@ export default function Home({
   const [query, setQuery] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
     const t1 = setTimeout(() => setMoveUp(true), 800);
@@ -81,6 +83,8 @@ export default function Home({
 
     setLoading(true);
     setResult("");
+    setImageLoading(true);
+    setImages([]);
 
     try {
       const colorList = favoriteColors
@@ -100,22 +104,50 @@ export default function Home({
         ? `${query}\n\nProfile preferences:\n${profileLines.join("\n")}`
         : query;
 
-      const response = await fetch("http://localhost:5000/api/style", {
+      const styleRequest = fetch("http://localhost:5000/api/style", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ query: enrichedQuery }),
+      }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Style request failed");
+        }
+        return response.json();
       });
 
-      const data = await response.json();
-      setResult(data.result || "No suggestion found");
+      const imageRequest = fetch(
+        `http://localhost:5000/api/image?query=${encodeURIComponent(query)}&count=3`
+      ).then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Image request failed");
+        }
+        return response.json();
+      });
+
+      const [styleOutcome, imageOutcome] = await Promise.allSettled([
+        styleRequest,
+        imageRequest,
+      ]);
+
+      if (styleOutcome.status === "fulfilled") {
+        setResult(styleOutcome.value?.result || "No suggestion found");
+      } else {
+        setResult("Server error. Try again.");
+      }
+
+      if (imageOutcome.status === "fulfilled") {
+        const gallery = imageOutcome.value?.images || [];
+        setImages(gallery);
+      }
     } catch (err) {
       console.error("Frontend error:", err);
       setResult("Server error. Try again.");
+    } finally {
+      setLoading(false);
+      setImageLoading(false);
     }
-
-    setLoading(false);
   };
 
   const renderResult = () => {
@@ -184,13 +216,64 @@ export default function Home({
         </div>
       )}
 
-      {(loading || result) && (
+      {(loading || result || imageLoading || images.length > 0) && (
         <div className="result-box">
-          {loading ? (
-            <p className="result-loading">Finding the perfect style for you...</p>
-          ) : (
-            renderResult()
+          {(imageLoading || images.length > 0) && (
+            <div className="result-gallery">
+              {imageLoading && images.length === 0
+                ? Array.from({ length: 3 }).map((_, index) => (
+                    <div className="image-skeleton" key={`sk-${index}`} />
+                  ))
+                : images.map((image, index) => (
+                    <figure className="gallery-card" key={`img-${index}`}>
+                      <img
+                        src={image.imageUrl}
+                        alt={image.imageAlt || "Style suggestion"}
+                      />
+                      {(image.creditName || image.imageLink) && (
+                        <figcaption className="image-credit">
+                          Photo{" "}
+                          {image.creditLink ? (
+                            <a
+                              href={image.creditLink}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {image.creditName || "Unsplash"}
+                            </a>
+                          ) : (
+                            image.creditName || "Unsplash"
+                          )}{" "}
+                          {image.imageLink ? (
+                            <>
+                              on{" "}
+                              <a
+                                href={image.imageLink}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Unsplash
+                              </a>
+                            </>
+                          ) : (
+                            "on Unsplash"
+                          )}
+                        </figcaption>
+                      )}
+                    </figure>
+                  ))}
+            </div>
           )}
+
+          <div className="result-text-panel">
+            {loading ? (
+              <p className="result-loading">
+                Finding the perfect style for you...
+              </p>
+            ) : (
+              renderResult()
+            )}
+          </div>
         </div>
       )}
     </div>
