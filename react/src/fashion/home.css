@@ -1,11 +1,13 @@
 /* ===== Container ===== */
 .home-container {
-  min-height: 97.5vh;
+  min-height: 100vh;
+  padding: 72px 24px 80px;
   background: linear-gradient(135deg, #fdf2f8, #f3e8ff);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 18px;
   font-family: "Poppins", sans-serif;
 }
 
@@ -16,13 +18,13 @@
 }
 
 .move-up {
-  transform: translateY(-140px);
+  transform: translateY(-80px);
 }
 
 /* ===== Brand Title ===== */
 .brand-title {
   font-family: "Playfair Display", serif;
-  font-size: 72px;
+  font-size: clamp(44px, 6vw, 72px);
   font-weight: 700;
   color: #2b1c2f;
   margin-bottom: 14px;
@@ -32,7 +34,7 @@
 }
 
 .move-up .brand-title {
-  font-size: 76px;
+  font-size: clamp(48px, 6.5vw, 76px);
   letter-spacing: 4px;
 }
 
@@ -76,11 +78,13 @@
   margin-top: 44px;
   display: flex;
   gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
   animation: fadeIn 0.6s ease;
 }
 
 .search-input {
-  width: 360px;
+  width: min(420px, 85vw);
   padding: 14px 22px;
   border-radius: 9999px;
   border: none;
@@ -126,11 +130,73 @@
 }
 .result-box {
   margin-top: 30px;
-  padding: 20px;
-  max-width: 600px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  white-space: pre-wrap;
+  padding: 24px 28px;
+  width: min(860px, 92vw);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 16px 35px rgba(46, 16, 78, 0.12);
   line-height: 1.6;
+  text-align: left;
+}
+
+.result-loading {
+  margin: 0;
+  text-align: center;
+  color: #4b3a58;
+  font-weight: 500;
+}
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-intro {
+  margin: 0;
+  color: #3d2c44;
+  font-size: 15px;
+}
+
+.result-section {
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px dashed #e7d8f1;
+}
+
+.result-title {
+  margin: 0 0 8px;
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  color: #2b1c2f;
+}
+
+.result-paragraph {
+  margin: 0 0 8px;
+  color: #3d2c44;
+  font-size: 14.5px;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  padding: 6px 0;
+  align-items: baseline;
+}
+
+.result-label {
+  font-weight: 600;
+  color: #6d2e8b;
+}
+
+.result-text {
+  color: #3d2c44;
+}
+
+@media (max-width: 640px) {
+  .result-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
 }
